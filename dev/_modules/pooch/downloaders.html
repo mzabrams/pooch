@@ -218,6 +218,51 @@
     <span class="n">tqdm</span> <span class="o">=</span> <span class="kc">None</span>
 
 
+<span class="k">def</span> <span class="nf">choose_downloader</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Choose the appropriate downloader for the given URL based on the protocol.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    url : str</span>
+<span class="sd">        A URL (including protocol).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    downloader</span>
+<span class="sd">        A downloader class (either :class:`pooch.HTTPDownloader` or</span>
+<span class="sd">        :class:`pooch.FTPDownloader`).</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; downloader = choose_downloader(&quot;http://something.com&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; print(downloader.__class__.__name__)</span>
+<span class="sd">    HTTPDownloader</span>
+<span class="sd">    &gt;&gt;&gt; downloader = choose_downloader(&quot;https://something.com&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; print(downloader.__class__.__name__)</span>
+<span class="sd">    HTTPDownloader</span>
+<span class="sd">    &gt;&gt;&gt; downloader = choose_downloader(&quot;ftp://something.com&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; print(downloader.__class__.__name__)</span>
+<span class="sd">    FTPDownloader</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">known_downloaders</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;ftp&quot;</span><span class="p">:</span> <span class="n">FTPDownloader</span><span class="p">,</span>
+        <span class="s2">&quot;https&quot;</span><span class="p">:</span> <span class="n">HTTPDownloader</span><span class="p">,</span>
+        <span class="s2">&quot;http&quot;</span><span class="p">:</span> <span class="n">HTTPDownloader</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">parse_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">parsed_url</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">known_downloaders</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Unrecognized URL protocol &#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39;. Must be one of </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">parsed_url</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">],</span> <span class="n">url</span><span class="p">,</span> <span class="n">known_downloaders</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">downloader</span> <span class="o">=</span> <span class="n">known_downloaders</span><span class="p">[</span><span class="n">parsed_url</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">]]()</span>
+    <span class="k">return</span> <span class="n">downloader</span>
+
+
 <div class="viewcode-block" id="HTTPDownloader"><a class="viewcode-back" href="../../api/generated/pooch.HTTPDownloader.html#pooch.HTTPDownloader">[docs]</a><span class="k">class</span> <span class="nc">HTTPDownloader</span><span class="p">:</span>  <span class="c1"># pylint: disable=too-few-public-methods</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Download manager for fetching files over HTTP/HTTPS.</span>
@@ -480,7 +525,7 @@
     <p>
         &copy; Copyright 2018-2020, The Pooch Developers
       <span class="lastupdated">
-        Last updated on Jan 28, 2020.
+        Last updated on Apr 02, 2020.
       </span>
 
     </p>
